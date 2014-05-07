@@ -27,8 +27,6 @@ var myBlog = {
       $("#editPostModal").modal();
     });
     $("#editPostModal").on("click", ".submitUpdatePost", function(e) {
-       // alert("edit submit works");
-       // e.preventDefault();
         var postId = $("#editPostId").val();
        myBlog.updatePost(postId);
     });
@@ -71,7 +69,7 @@ var myBlog = {
         var newPost = {
               title: $(".newPostTitle").val(),
               date: new Date(),
-              content: $(".postContentForm").val(),
+              content: this.encodeToString($(".postContentForm").val()),
               author: $(".authorPostForm").val()
         };
     $.ajax({
@@ -107,9 +105,6 @@ var myBlog = {
 
       }
     });
-    
-
-
   },
   updatePost: function(postId) {
      console.log("work in update method");
@@ -117,14 +112,13 @@ var myBlog = {
         var editPost = {
               title: $(".editPostTitle").val(),
               date: new Date(),
-              content: $(".editContentForm").val(),
+              content: this.encodeToString($(".editContentForm").val()),
               author: $(".editAuthorPostForm").val()
         };
     $.ajax({
       url: "http://tiy-fee-rest.herokuapp.com/collections/myBlog/" + id,
       type: "PUT",
       data: editPost, 
-      // dataType: "json",
       error: function(jqXHR, status, error) {
         alert("couldn't add post: " + error);
       },
@@ -137,24 +131,8 @@ var myBlog = {
     });
 
   },
-  removePost: function() {
-    var $thisPost = $(this).closest("article")
-    var postId = $thisPost.data("postid");
-    $.ajax({
-      url: "http://tiy-fee-rest.herokuapp.com/collections/myBlog/" + postId,
-      type: "DELETE",
-      error: function(jqXHR, status, error) {
-        alert("couldnt delete");
-      }, 
-      success: function(data) {
-         myBlog.renderPosts();  
-
-      }
-    });
-  },
   renderModalPostDetail: function(postId) {
 
-    console.log(postId);
     $.ajax({
       url: "http://tiy-fee-rest.herokuapp.com/collections/myBlog/" + postId,
       type: "GET",
@@ -163,21 +141,18 @@ var myBlog = {
         alert("render post detail is broken");
       },
       success: function(data, dataType, jqXHR) {
-        // myBlog.render($("#editPostForm"),Templates.editModal, data);
+        
         var post = window.post = data; // have to make global for underscore to work
-        var compiled = _.template(Templates.editModal);
-
-        $("#editPostForm").html(compiled(post));
-         
+        myBlog.render($("#editPostForm"),Templates.editModal, post);
 
       }
     });
 
   },
+  encodeToString: function(str) {
+    return str.replace(/[&<>"']/g, function($0) {
+        return "&" + {"&":"amp", "<":"lt", ">":"gt", '"':"quot", "'":"#39"}[$0] + ";";
+    });
+}
 
 };
-
-
-
-
-

@@ -3,7 +3,7 @@ $icon-font-path: "/bower_components/bootstrap-sass-official/vendor/assets/fonts/
 // bower:scss
 @import "../bower_components/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap.scss";
 // endbower
-
+.glyphicon-pencil, .glyphicon-remove { cursor: pointer; margin-left:5px;}
 .browsehappy {
     margin: 0.2em 0;
     background: #ccc;

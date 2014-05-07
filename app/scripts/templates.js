@@ -11,11 +11,11 @@ Templates.post = [
 	 "<% _.each(posts, function(post, index , list) { %>",
 
            "<article data-postId=\"<%= post._id %>\">",
-            "<h3 class=\"postTitle\"><%= post.title %> <small><%= post.date %></small><span class=\"glyphicon glyphicon-pencil editPost\"></span><span class=\"glyphicon glyphicon-remove removePost\"></span></h3>",
+            "<h3 class=\"postTitle\"><%= post.title %> <small><%= post.date %></small></h3>",
             "<div class=\"postContent\">",
-                   "<%= post.content %>",
+                   "<p><%= post.content %></p>",
                 "</div>",
-                "<div class=\"authorPost\"><%= post.author %></div>",
+                "<div class=\"authorPost\"><small><strong>Author:</strong></small> <%= post.author %> <span class=\"glyphicon glyphicon-pencil editPost\"></span><span class=\"glyphicon glyphicon-remove removePost\"></span> </div>",
             "</article>",
         "<% }); %>"
 ].join("\n");

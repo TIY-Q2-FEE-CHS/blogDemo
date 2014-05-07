@@ -17,25 +17,6 @@
         <!-- build:css(.tmp) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
-        <script type="template/html" id="postTmpl">
-        <% _.each(posts, function(post, index , list) { %>
-
-            <article>
-                <h3 class="postTitle"><%= post.title %> <small><%= post.date %></small><span class="glyphicon glyphicon-remove removePost"></span></h3>
-                <div class="postContent">
-                
-                   <%= post.content %>
-                </div>
-                <div class="authorPost"><%= post.author %></div>
-            </article>
-        <% }); %>
-        </script>
-        <script type="template/html" id="recentPostsTmpl">
-        <% _.each(posts, function(post, index , list) { %>
-            
-            <li><a href=""><%= post.title %></a></li>
-           
-        <% }); %>
         </script>
     </head>
     <body>
@@ -72,10 +53,6 @@
             </div>
 
             </div>
-
-        
-
-            
     <div class="footer">
         <p><span class="glyphicon glyphicon-heart"></span> You for you about you, love you!</p>
     </div>
@@ -100,7 +77,7 @@
                 <input type="text" class="form-control authorPostForm" id="authorPostForm" placeholder="Author">
               </div>
               <div class="form-group">
-                <label for="postContent">Post</label>
+                <label for="postContentForm">Post</label>
                 <textarea id="postContentForm" class="form-control postContentForm"></textarea>
                 <p class="help-block">Example block-level help text here.</p>
               </div>

@@ -1,10 +1,9 @@
 Templates = {};
 
-Templates.sidebarPost = [
-	"<h2><%= post.title %></h2>",
-	"<div class=\"postContent\">",
-		"<%= post.content %>",
-	"</div>"
+Templates.sidebarPosts = [
+	 "<% _.each(titles, function(title, index , list) { %>",
+        "<li><a href=\"\"><%= title %></a></li>",
+    "<% }); %>"
 ].join("\n");
 
 Templates.post = [

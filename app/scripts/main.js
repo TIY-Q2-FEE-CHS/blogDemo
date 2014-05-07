@@ -12,6 +12,7 @@ var myBlog = {
   initStyling: function() {
     
     this.renderPosts();
+    this.renderSideBar();
 
   },
   initEvents: function() {
@@ -61,13 +62,26 @@ var myBlog = {
     });
 
   },
+  renderSideBar: function() {
+    $.ajax({
+      url:"http://tiy-fee-rest.herokuapp.com/collections/myBlog",
+      type: "GET",
+      error: function(jqXHR, status, error) {
+        alert("error rendering sidebar: " + error);
+      },
+      success: function(data) {
+        var titles = window.titles = _.pluck(data, "title");
+        myBlog.render($(".recentPosts"), Templates.sidebarPosts, titles);
+      }
+    });
+  },
   addPost: function(e) {
     e.preventDefault();
 
         var newPost = {
               title: $(".newPostTitle").val(),
               date: new Date(),
-              content: this.encodeToString($(".postContentForm").val()),
+              content: myBlog.encodeToString($(".postContentForm").val()),
               author: $(".authorPostForm").val()
         };
     $.ajax({
@@ -84,7 +98,7 @@ var myBlog = {
         $(".postContentForm").val(""); 
         $("#myModal").modal("hide");
         myBlog.renderPosts();  
-
+        myBlog.renderSideBar();
       }
     });
 
@@ -100,7 +114,7 @@ var myBlog = {
       }, 
       success: function(data) {
          myBlog.renderPosts();  
-
+         myBlog.renderSideBar();
       }
     });
   },
@@ -124,7 +138,7 @@ var myBlog = {
         console.log("in edit post");
         $("#editPostModal").modal("hide");
         myBlog.renderPosts();  
-
+        myBlog.renderSideBar();
       }
     });
 

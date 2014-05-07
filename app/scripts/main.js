@@ -1,64 +1,183 @@
 $(document).ready(function() {
-	// put dom stuff here
-
-  var myPostsString = _.template($("#postTmpl").html(), posts);
-  var recentPostsString = _.template($("#recentPostsTmpl").html(), posts);
-
-  $("section").append(myPostsString);
-  $(".recentPosts").append(recentPostsString);
-
-  $(".mainContent").on("click", "button", function() {
-
-     $('#myModal').modal();
-
-  });
-
-  $("#newPostForm").on("submit", function(e) {
-  		e.preventDefault();
-  		// var formData = $(this).serializeArray();
-  		// console.log($(this).serializeArray());
-  		var postTitle = $(".newPostTitle").val();
-  		var authorPostForm = $(".authorPostForm").val();
-  		var postContentForm = $(".postContentForm").val();
-  		console.log(postContentForm);
-
-  		var newPostObj = {
-  					title: postTitle,
-  					date: "Tuesday, 29, 2014",
-  					content: postContentForm,
-  					author: authorPostForm
-  		};
-  		posts.unshift(newPostObj);
-  		var myPostsString = _.template($("#postTmpl").html(), posts);
-
-  		$(".newPostTitle").val("");
-  		$(".authorPostForm").val("");
-  		$(".postContentForm").val(""); 
-  		$("#myModal").modal("hide");
-  		$("section").html(myPostsString);
-
-
-  });
-
-  $(".mainContent").on("click", ".removePost", function() {
-  		$(this).closest("article").remove();
-
-  });
-
+	
+  myBlog.init();
 
 });
 
-var mypage = {
-			createTemplateString: function($template, data) {
+var myBlog = {
+  init: function() {
+    this.initStyling();
+    this.initEvents();
+  },
+  initStyling: function() {
+    
+    this.renderPosts();
 
-				var tmpl = _.template($tmplate, data);
-				return tmpl;
-			},
+  },
+  initEvents: function() {
 
-			addTemplateToDom: function($el, tmplString) {
-					$el.html(tmplString);
+    $(".mainContent").on("click", "button", function() {
+      $("#myModal").modal();
+    });
 
-			}
+    $(".mainContent").on("click", ".editPost", function(e) {
+      e.preventDefault();
+      var postId = $(this).closest("article").data("postid");
+      myBlog.renderModalPostDetail(postId);
+      $("#editPostModal").modal();
+    });
+    $("#editPostModal").on("click", ".submitUpdatePost", function(e) {
+       // alert("edit submit works");
+       // e.preventDefault();
+        var postId = $("#editPostId").val();
+       myBlog.updatePost(postId);
+    });
 
+    $(".mainContent").on("click", ".removePost", this.removePost);
+
+    $("#newPostForm").on("submit", this.addPost);
+
+  },
+  render: function($el, template, data) {
+      var tmpl = _.template(template, data);
+
+      $el.html(tmpl);
+
+  },
+  renderPosts: function() {
+
+    $.ajax({
+      url: "http://tiy-fee-rest.herokuapp.com/collections/myBlog",
+      type: "GET",
+      dataType: "json",
+      error: function(jqXHR, status, error) {
+        alert("you broke the internet");
+      },
+      success: function(data, dataType, jqXHR) {
+        
+        var posts = window.posts = data; // have to make global for underscore to work
+        var compiled = _.template(Templates.post);
+
+        $("section").html(compiled(posts));
+         
+
+      }
+    });
+
+  },
+  addPost: function(e) {
+    e.preventDefault();
+
+        var newPost = {
+              title: $(".newPostTitle").val(),
+              date: new Date(),
+              content: $(".postContentForm").val(),
+              author: $(".authorPostForm").val()
+        };
+    $.ajax({
+      url: "http://tiy-fee-rest.herokuapp.com/collections/myBlog",
+      type: "POST",
+      data: newPost, 
+      dataType: "json",
+      error: function(jqXHR, status, error) {
+        alert("couldn't add post");
+      },
+      success: function(data, dataType, jqXHR) {
+        $(".newPostTitle").val("");
+        $(".authorPostForm").val("");
+        $(".postContentForm").val(""); 
+        $("#myModal").modal("hide");
+        myBlog.renderPosts();  
+
+      }
+    });
+
+  },
+  removePost: function() {
+    var $thisPost = $(this).closest("article")
+    var postId = $thisPost.data("postid");
+    $.ajax({
+      url: "http://tiy-fee-rest.herokuapp.com/collections/myBlog/" + postId,
+      type: "DELETE",
+      error: function(jqXHR, status, error) {
+        alert("couldnt delete");
+      }, 
+      success: function(data) {
+         myBlog.renderPosts();  
+
+      }
+    });
+    
+
+
+  },
+  updatePost: function(postId) {
+     console.log("work in update method");
+     var id = postId;
+        var editPost = {
+              title: $(".editPostTitle").val(),
+              date: new Date(),
+              content: $(".editContentForm").val(),
+              author: $(".editAuthorPostForm").val()
+        };
+    $.ajax({
+      url: "http://tiy-fee-rest.herokuapp.com/collections/myBlog/" + id,
+      type: "PUT",
+      data: editPost, 
+      // dataType: "json",
+      error: function(jqXHR, status, error) {
+        alert("couldn't add post: " + error);
+      },
+      success: function(data, dataType, jqXHR) {
+        console.log("in edit post");
+        $("#editPostModal").modal("hide");
+        myBlog.renderPosts();  
+
+      }
+    });
+
+  },
+  removePost: function() {
+    var $thisPost = $(this).closest("article")
+    var postId = $thisPost.data("postid");
+    $.ajax({
+      url: "http://tiy-fee-rest.herokuapp.com/collections/myBlog/" + postId,
+      type: "DELETE",
+      error: function(jqXHR, status, error) {
+        alert("couldnt delete");
+      }, 
+      success: function(data) {
+         myBlog.renderPosts();  
+
+      }
+    });
+  },
+  renderModalPostDetail: function(postId) {
+
+    console.log(postId);
+    $.ajax({
+      url: "http://tiy-fee-rest.herokuapp.com/collections/myBlog/" + postId,
+      type: "GET",
+      dataType: "json",
+      error: function(jqXHR, status, error) {
+        alert("render post detail is broken");
+      },
+      success: function(data, dataType, jqXHR) {
+        // myBlog.render($("#editPostForm"),Templates.editModal, data);
+        var post = window.post = data; // have to make global for underscore to work
+        var compiled = _.template(Templates.editModal);
+
+        $("#editPostForm").html(compiled(post));
+         
+
+      }
+    });
+
+  },
 
 };
+
+
+
+
+

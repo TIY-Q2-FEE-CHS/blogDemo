@@ -54,9 +54,7 @@ var myBlog = {
       success: function(data, dataType, jqXHR) {
         
         var posts = window.posts = data; // have to make global for underscore to work
-        var compiled = _.template(Templates.post);
-
-        $("section").html(compiled(posts));
+        myBlog.render($("section"), Templates.post, posts);
          
 
       }
